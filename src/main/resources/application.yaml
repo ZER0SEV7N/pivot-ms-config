@@ -1,3 +1,24 @@
+# Server Port 8888
+server:
+  port: 8888
+
 spring:
   application:
     name: ms-config
+  profiles:
+    active: native # Use the native profile to load configuration from the local file system
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-data
+            # Optional Git mode if you push the config-data folder to a GitHub repository:
+            # git:
+            #   uri: https://github.com/ZER0SEV7N/pivot-config-data.git
+            #   default-label: main
+            #   clone-on-start: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, env

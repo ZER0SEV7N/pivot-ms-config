@@ -1,0 +1,13 @@
+# Configuration for ms-customer microservice
+server:
+  port: 8081
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_customer}
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.customer: DEBUG

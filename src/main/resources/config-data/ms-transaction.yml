@@ -1,0 +1,20 @@
+# Configuration for ms-transaction microservices
+server:
+  port: 8084
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
+
+application:
+  clients:
+    account-service:
+      url: ${ACCOUNT_SERVICE_URL:http://localhost:8082/api/v1/accounts}
+    credit-service:
+      url: ${CREDIT_SERVICE_URL:http://localhost:8083/api/v1/credits}
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.transaction: DEBUG

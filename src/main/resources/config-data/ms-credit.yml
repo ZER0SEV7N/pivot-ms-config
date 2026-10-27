@@ -1,0 +1,19 @@
+# Configuration for ms-credit microservises
+
+server:
+  port: 8083
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_credit}
+
+application:
+  clients:
+    customer-service:
+      url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.credit: DEBUG

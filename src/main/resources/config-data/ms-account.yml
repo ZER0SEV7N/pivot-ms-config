@@ -1,0 +1,18 @@
+# Configuration for ms-account microservices
+server:
+  port: 8082
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_account}
+
+application:
+  clients:
+    customer-service:
+      url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.account: DEBUG

@@ -3,11 +3,30 @@ server:
   port: 8082
 
 spring:
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_account}
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_account}
+      host: localhost
+      port: 27017
+      database: db_pivot_account
+  cloud:
+    vault:
+      uri: ${VAULT_URI:http://127.0.0.1:8200}
+      authentication: TOKEN
+      token: ${VAULT_TOKEN}
+      kv:
+        enabled: true
+        backend: secret
+        default-context: pivot-bank
 
 application:
+  account-rules:
+    checking-maintenance-fee: ${CHECKING_MAINTENANCE_FEE:15.00}
+    savings-max-monthly-movements: ${SAVINGS_MAX_MOVEMENTS:5}
+    fixed-term-max-monthly-movements: ${FIXED_TERM_MAX_MOVEMENTS:1}
+    zero-maintenance-fee: 0.00
   clients:
     customer-service:
       url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}

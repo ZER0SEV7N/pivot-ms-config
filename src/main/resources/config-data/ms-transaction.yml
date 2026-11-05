@@ -3,9 +3,14 @@ server:
   port: 8084
 
 spring:
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transactions}
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transactions}
+      host: localhost
+      port: 27017
+      database: db_pivot_transactions
 
 application:
   clients:

@@ -11,7 +11,7 @@
 	<groupId>com.pe.pivot.config</groupId>
 	<artifactId>ms-config</artifactId>
 	<version>1.0.0</version>
-	<name>ms-config</name>
+	<name>MS Config</name>
 	<description>Centralized Configuration Server for Pivot Banking System</description>
 
 	<url/>

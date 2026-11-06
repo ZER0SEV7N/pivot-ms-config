@@ -1,4 +1,3 @@
-# Configuration for ms-account microservices
 server:
   port: 8082
 
@@ -11,15 +10,6 @@ spring:
       host: localhost
       port: 27017
       database: db_pivot_account
-  cloud:
-    vault:
-      uri: ${VAULT_URI:http://127.0.0.1:8200}
-      authentication: TOKEN
-      token: ${VAULT_TOKEN}
-      kv:
-        enabled: true
-        backend: secret
-        default-context: pivot-bank
 
 application:
   account-rules:

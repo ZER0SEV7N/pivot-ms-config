@@ -1,0 +1,82 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: ms-customer-route
+              uri: lb://ms-customer
+              predicates:
+                - Path=/api/v1/customers/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: customerCircuitBreaker
+                    fallbackUri: forward:/fallback/customers
+
+            - id: ms-account-route
+              uri: lb://ms-account
+              predicates:
+                - Path=/api/v1/accounts/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: accountCircuitBreaker
+                    fallbackUri: forward:/fallback/accounts
+
+            - id: ms-credit-route
+              uri: lb://ms-credit
+              predicates:
+                - Path=/api/v1/credits/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: creditCircuitBreaker
+                    fallbackUri: forward:/fallback/credits
+
+            - id: ms-transaction-route
+              uri: lb://ms-transaction
+              predicates:
+                - Path=/api/v1/transactions/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: transactionCircuitBreaker
+                    fallbackUri: forward:/fallback/transactions
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,circuitbreakers

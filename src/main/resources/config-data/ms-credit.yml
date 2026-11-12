@@ -14,6 +14,11 @@ spring:
       database: db_pivot_credit
 
 application:
+  credit-rules:
+    default-personal-loan-rate: ${PERSONAL_LOAN_RATE:16.50}
+    default-business-loan-rate: ${BUSINESS_LOAN_RATE:12.00}
+    default-credit-card-rate: ${CREDIT_CARD_RATE:35.90}
+    default-payment-due-day: ${DEFAULT_PAYMENT_DUE_DAY:15}
   clients:
     customer-service:
       url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}

@@ -4,16 +4,21 @@ server:
 
 spring:
   mongodb:
-    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transactions}
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transactions}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
       host: localhost
       port: 27017
-      database: db_pivot_transactions
+      database: db_pivot_transaction
 
 application:
+  transaction-rules:
+    operation-prefix: ${OPERATION_PREFIX:OP-}
+    default-fee: ${DEFAULT_TRANSACTION_FEE:0.00}
   clients:
+    customer-service:
+      url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}
     account-service:
       url: ${ACCOUNT_SERVICE_URL:http://localhost:8082/api/v1/accounts}
     credit-service:

@@ -1,3 +1,4 @@
+# Configuration for ms-account
 server:
   port: 8082
 
@@ -13,18 +14,19 @@ spring:
 
 application:
   account-rules:
-    checking-maintenance-fee: ${CHECKING_MAINTENANCE_FEE:15.00}
     savings-max-monthly-movements: ${SAVINGS_MAX_MOVEMENTS:5}
-    fixed-term-max-monthly-movements: ${FIXED_TERM_MAX_MOVEMENTS:1}
-    zero-maintenance-fee: 0.00
+    checking-default-maintenance-fee: ${CHECKING_MAINTENANCE_FEE:15.00}
+    fixed-term-default-movement-day: ${FIXED_TERM_MOVEMENT_DAY:28}
+    default-min-opening-amount: ${DEFAULT_MIN_OPENING_AMOUNT:0.00}
+    vip-min-opening-amount: ${VIP_MIN_OPENING_AMOUNT:500.00}
+    vip-minimum-daily-average: ${VIP_MIN_DAILY_AVERAGE:500.00}
+    max-free-monthly-transactions: ${MAX_FREE_TRANSACTIONS:3}
+    default-transaction-commission: ${DEFAULT_TX_COMMISSION:5.00}
   clients:
     customer-service:
       url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}
-
-logging:
-  level:
-    root: INFO
-    com.pe.pivot.account: DEBUG
+    credit-service:
+      url: ${CREDIT_SERVICE_URL:http://localhost:8083/api/v1/credits}
 
 eureka:
   client:
@@ -32,3 +34,22 @@ eureka:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
   instance:
     prefer-ip-address: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.account: DEBUG

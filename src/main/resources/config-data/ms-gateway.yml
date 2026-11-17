@@ -2,53 +2,74 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: ms-gateway
+  cloud:
     gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
-          routes:
-            - id: ms-customer-route
-              uri: lb://ms-customer
-              predicates:
-                - Path=/api/v1/customers/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: customerCircuitBreaker
-                    fallbackUri: forward:/fallback/customers
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: ms-auth-route
+          uri: lb://ms-auth
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: authServiceCircuitBreaker
+                fallbackUri: forward:/fallback/ms-auth
 
-            - id: ms-account-route
-              uri: lb://ms-account
-              predicates:
-                - Path=/api/v1/accounts/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: accountCircuitBreaker
-                    fallbackUri: forward:/fallback/accounts
+        - id: ms-customer-route
+          uri: lb://ms-customer
+          predicates:
+            - Path=/api/v1/customers/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: customerServiceCircuitBreaker
+                fallbackUri: forward:/fallback/ms-customer
 
-            - id: ms-credit-route
-              uri: lb://ms-credit
-              predicates:
-                - Path=/api/v1/credits/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: creditCircuitBreaker
-                    fallbackUri: forward:/fallback/credits
+        - id: ms-account-route
+          uri: lb://ms-account
+          predicates:
+            - Path=/api/v1/accounts/**, /api/v1/debit-cards/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: accountServiceCircuitBreaker
+                fallbackUri: forward:/fallback/ms-account
 
-            - id: ms-transaction-route
-              uri: lb://ms-transaction
-              predicates:
-                - Path=/api/v1/transactions/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: transactionCircuitBreaker
-                    fallbackUri: forward:/fallback/transactions
+        - id: ms-credit-route
+          uri: lb://ms-credit
+          predicates:
+            - Path=/api/v1/credits/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: creditServiceCircuitBreaker
+                fallbackUri: forward:/fallback/ms-credit
+
+        - id: ms-transaction-route
+          uri: lb://ms-transaction
+          predicates:
+            - Path=/api/v1/transactions/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: transactionServiceCircuitBreaker
+                fallbackUri: forward:/fallback/ms-transaction
+
+        - id: ms-yanki-route
+          uri: lb://ms-yanki
+          predicates:
+            - Path=/api/v1/yanki/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: yankiServiceCircuitBreaker
+                fallbackUri: forward:/fallback/ms-yanki
 
 eureka:
   client:
@@ -56,6 +77,12 @@ eureka:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
   instance:
     prefer-ip-address: true
+
+application:
+  security:
+    jwt:
+      enabled: ${JWT_AUTH_ENABLED:true}
+      secret-key: ${jwt-secret-key:UGl2b3RCYW5rSldUU2lnbmluZ1NlY3JldEtleTIwMjZTaGExMjM0NTY3ODkw}
 
 resilience4j:
   circuitbreaker:
@@ -65,15 +92,13 @@ resilience4j:
         minimumNumberOfCalls: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
   timelimiter:
     configs:
       default:
         timeoutDuration: 2s
         cancelRunningFuture: true
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,gateway,circuitbreakers
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.gateway: DEBUG

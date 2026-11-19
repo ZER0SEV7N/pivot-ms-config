@@ -12,9 +12,6 @@ spring:
       host: localhost
       port: 27017
       database: db_pivot_credit
-  redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
 
 application:
   credit-rules:

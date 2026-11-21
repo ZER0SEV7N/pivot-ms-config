@@ -1,9 +1,10 @@
+# Configuration for ms-eureka microservice
 server:
   port: 8761
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: ${EUREKA_HOSTNAME:localhost}
   client:
     register-with-eureka: false
     fetch-registry: false

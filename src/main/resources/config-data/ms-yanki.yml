@@ -1,3 +1,4 @@
+# Configuration for ms-yanki microservice
 server:
   port: 8086
 
@@ -15,6 +16,8 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
     consumer:
       group-id: ms-yanki-group
       auto-offset-reset: earliest
@@ -22,6 +25,8 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.pe.pivot.yanki.infrastructure.adapter.in.messaging.dto.YankiPaymentResultEvent
 
 eureka:
   client:

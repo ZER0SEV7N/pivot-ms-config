@@ -1,5 +1,4 @@
 # Configuration for ms-credit microservises
-
 server:
   port: 8083
 
@@ -9,9 +8,6 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_credit}
-      host: localhost
-      port: 27017
-      database: db_pivot_credit
 
 application:
   credit-rules:

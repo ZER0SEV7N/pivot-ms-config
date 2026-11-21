@@ -1,3 +1,4 @@
+# Configuration for ms-auth microservice
 server:
   port: 8085
 

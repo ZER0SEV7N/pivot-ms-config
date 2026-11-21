@@ -8,9 +8,6 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_customer}
-      host: localhost
-      port: 27017
-      database: db_pivot_customer
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}

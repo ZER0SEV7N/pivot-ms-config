@@ -8,14 +8,14 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
-      host: localhost
-      port: 27017
-      database: db_pivot_transaction
+
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
     consumer:
       group-id: ${spring.application.name}-group
       auto-offset-reset: earliest
@@ -23,6 +23,8 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.pe.pivot.transaction.infrastructure.adapter.in.messaging.dto.YankiPaymentResultEvent
 
 application:
   transaction-rules:
@@ -33,6 +35,8 @@ application:
       url: ${CUSTOMER_SERVICE_URL:http://localhost:8081/api/v1/customers}
     account-service:
       url: ${ACCOUNT_SERVICE_URL:http://localhost:8082/api/v1/accounts}
+    debit-card-service:
+      url: ${DEBIT_CARD_SERVICE_URL:http://localhost:8082/api/v1/debit-cards}
     credit-service:
       url: ${CREDIT_SERVICE_URL:http://localhost:8083/api/v1/credits}
   kafka-topics:

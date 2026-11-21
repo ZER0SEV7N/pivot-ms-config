@@ -5,9 +5,6 @@ server:
 spring:
   mongodb:
     uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_transaction}
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}

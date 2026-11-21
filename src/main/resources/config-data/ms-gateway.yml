@@ -1,4 +1,8 @@
 # Configuration for ms-gateway microservice
+# NOTE: Spring Cloud Gateway 5.x (Spring Boot 4) uses the prefix
+#       spring.cloud.gateway.server.webflux.*
+#       The old spring.cloud.gateway.* prefix is silently ignored and every
+#       route returns 404.
 server:
   port: 8080
 
@@ -7,70 +11,72 @@ spring:
     name: ms-gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-      routes:
-        - id: ms-auth-route
-          uri: lb://ms-auth
-          predicates:
-            - Path=/api/v1/auth/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: authServiceCircuitBreaker
-                fallbackUri: forward:/fallback/ms-auth
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: ms-auth-route
+              uri: lb://ms-auth
+              predicates:
+                - Path=/api/v1/auth/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/ms-auth
 
-        - id: ms-customer-route
-          uri: lb://ms-customer
-          predicates:
-            - Path=/api/v1/customers/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: customerServiceCircuitBreaker
-                fallbackUri: forward:/fallback/ms-customer
+            - id: ms-customer-route
+              uri: lb://ms-customer
+              predicates:
+                - Path=/api/v1/customers/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: customerServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/ms-customer
 
-        - id: ms-account-route
-          uri: lb://ms-account
-          predicates:
-            - Path=/api/v1/accounts/**, /api/v1/debit-cards/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: accountServiceCircuitBreaker
-                fallbackUri: forward:/fallback/ms-account
+            - id: ms-account-route
+              uri: lb://ms-account
+              predicates:
+                - Path=/api/v1/accounts/**,/api/v1/debit-cards/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: accountServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/ms-account
 
-        - id: ms-credit-route
-          uri: lb://ms-credit
-          predicates:
-            - Path=/api/v1/credits/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: creditServiceCircuitBreaker
-                fallbackUri: forward:/fallback/ms-credit
+            - id: ms-credit-route
+              uri: lb://ms-credit
+              predicates:
+                - Path=/api/v1/credits/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: creditServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/ms-credit
 
-        - id: ms-transaction-route
-          uri: lb://ms-transaction
-          predicates:
-            - Path=/api/v1/transactions/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: transactionServiceCircuitBreaker
-                fallbackUri: forward:/fallback/ms-transaction
+            - id: ms-transaction-route
+              uri: lb://ms-transaction
+              predicates:
+                - Path=/api/v1/transactions/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: transactionServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/ms-transaction
 
-        - id: ms-yanki-route
-          uri: lb://ms-yanki
-          predicates:
-            - Path=/api/v1/yanki/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: yankiServiceCircuitBreaker
-                fallbackUri: forward:/fallback/ms-yanki
+            - id: ms-yanki-route
+              uri: lb://ms-yanki
+              predicates:
+                - Path=/api/v1/yanki/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: yankiServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/ms-yanki
 
 eureka:
   client:

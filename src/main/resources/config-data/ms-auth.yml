@@ -5,9 +5,9 @@ server:
 spring:
   application:
     name: ms-auth
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_auth}
+  # Spring Boot 4 renamed spring.data.mongodb.* to spring.mongodb.*
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_auth}
 
 eureka:
   client:

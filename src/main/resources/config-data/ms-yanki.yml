@@ -5,9 +5,10 @@ server:
 spring:
   application:
     name: ms-yanki
+  # Spring Boot 4 renamed spring.data.mongodb.* to spring.mongodb.*
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_yanki}
   data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_yanki}
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}

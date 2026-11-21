@@ -5,9 +5,6 @@ server:
 spring:
   mongodb:
     uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_credit}
-  data:
-    mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_credit}
 
 application:
   credit-rules:

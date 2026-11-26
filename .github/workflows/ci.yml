@@ -1,0 +1,118 @@
+name: Pivot Config Server CI
+
+on:
+  push:
+    branches: [master, main, 'phase-*', 'Feat-*', 'feat/*']
+  pull_request:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secret-scan:
+    name: Secret Scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks secret detection
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  validate-config-yaml:
+    name: Validate Config YAMLs & Boot 4 / Gateway 5 Rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Validate YAML syntax & Spring Boot 4 / Gateway 5 compatibility
+        shell: python3 {0}
+        run: |
+          import glob, sys, yaml
+
+          files = sorted(glob.glob("src/main/resources/**/*.yml", recursive=True)
+                         + glob.glob("src/main/resources/**/*.yaml", recursive=True))
+          if not files:
+              print("::error::No YAML configuration files found in src/main/resources/")
+              sys.exit(1)
+
+          errors = []
+          for path in files:
+              try:
+                  with open(path, "r", encoding="utf-8") as f:
+                      data = yaml.safe_load(f)
+                  print(f"OK YAML syntax: {path}")
+              except Exception as exc:
+                  errors.append(f"{path}: invalid YAML syntax -> {exc}")
+                  continue
+
+              if not isinstance(data, dict):
+                  continue
+
+              # Guard 1: Spring Boot 4 deprecated spring.data.mongodb.* (must use spring.mongodb.uri)
+              spring = data.get("spring") or {}
+              if isinstance(spring, dict):
+                  data_cfg = spring.get("data") or {}
+                  if isinstance(data_cfg, dict) and "mongodb" in data_cfg:
+                      errors.append(
+                          f"{path}: uses deprecated 'spring.data.mongodb.*' (use 'spring.mongodb.uri' for Spring Boot 4)"
+                      )
+
+              # Guard 2: Spring Cloud Gateway 5.x requires spring.cloud.gateway.server.webflux.*
+              if path.endswith("ms-gateway.yml"):
+                  gw = (spring.get("cloud") or {}).get("gateway") or {}
+                  if "routes" in gw and "server" not in gw:
+                      errors.append(
+                          f"{path}: routes defined under legacy 'spring.cloud.gateway.routes' "
+                          "(must be 'spring.cloud.gateway.server.webflux.routes' for Gateway 5.x)"
+                      )
+
+          if errors:
+              for err in errors:
+                  print(f"::error::{err}")
+              sys.exit(1)
+          print(f"Validated {len(files)} YAML configuration files successfully.")
+
+  build-and-test:
+    name: Build, Checkstyle & Context Load Test
+    runs-on: ubuntu-latest
+    needs: [validate-config-yaml]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Compile & Google Java Style Check
+        run: mvn -B test-compile checkstyle:check -Dcheckstyle.failsOnError=true -Dcheckstyle.violationSeverity=error
+
+      - name: Run Config Server Context Tests
+        # Skips JaCoCo 90% gate because ms-config only contains *Application.class (excluded from JaCoCo)
+        run: mvn -B test -Dcheckstyle.skip=true
+
+  docker-build-check:
+    name: Docker Image Build Verification
+    runs-on: ubuntu-latest
+    needs: [secret-scan, build-and-test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Verify Dockerfile builds cleanly
+        if: hashFiles('Dockerfile') != ''
+        run: docker build -t pivot-ci-verify:latest . || (sleep 15 && docker build -t pivot-ci-verify:latest .)

@@ -1,0 +1,49 @@
+# Configuration for ms-yanki microservice
+server:
+  port: 8086
+
+spring:
+  application:
+    name: ms-yanki
+  # Spring Boot 4 renamed spring.data.mongodb.* to spring.mongodb.*
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_yanki}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: ms-yanki-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.pe.pivot.yanki.infrastructure.adapter.in.messaging.dto.YankiPaymentResultEvent
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+application:
+  yanki:
+    cache-ttl-minutes: 30
+    topics:
+      payment-requested: yanki.payment.requested
+      payment-result: yanki.payment.result
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.yanki: DEBUG

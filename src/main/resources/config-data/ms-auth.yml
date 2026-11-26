@@ -1,0 +1,28 @@
+# Configuration for ms-auth microservice
+server:
+  port: 8085
+
+spring:
+  application:
+    name: ms-auth
+  # Spring Boot 4 renamed spring.data.mongodb.* to spring.mongodb.*
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017/db_pivot_auth}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+application:
+  security:
+    jwt:
+      secret-key: ${jwt-secret-key:UGl2b3RCYW5rSldUU2lnbmluZ1NlY3JldEtleTIwMjZTaGExMjM0NTY3ODkw}
+      expiration-ms: ${jwt-expiration-ms:3600000}
+
+logging:
+  level:
+    root: INFO
+    com.pe.pivot.auth: DEBUG

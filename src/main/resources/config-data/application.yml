@@ -6,4 +6,33 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,circuitbreakers,circuitbreakerevents
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_TRACES_ENDPOINT:http://pivot-tempo:4318/v1/traces}
+          transport: http
+  # Tempo only receives traces. Metrics keep coming from Loki/LogQL in this setup.
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  # The driver-native observability below replaces Boot's Mongo command metrics listener.
+  metrics:
+    mongo:
+      command:
+        enabled: false
+
+spring:
+  # Required so the trace/MDC context survives reactive operators and the RxJava3 bridge.
+  reactor:
+    context-propagation: auto
+  kafka:
+    template:
+      observation-enabled: true
+    listener:
+      observation-enabled: true
